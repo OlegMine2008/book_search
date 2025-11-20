@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'd:\MyNewWork\yandex\books\book_searcher.ui'
+# Form implementation generated from reading ui file 'd:\MyNewWork\yandex\book_search\book_search\data\book_searcher.ui'
 #
 # Created by: PyQt6 UI code generator 6.9.1
 #
