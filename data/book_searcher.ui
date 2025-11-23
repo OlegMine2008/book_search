@@ -63,7 +63,7 @@
      <string>Обновить информацию или заметки</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="search_method_2">
+   <widget class="QPushButton" name="add_book">
     <property name="geometry">
      <rect>
       <x>580</x>
