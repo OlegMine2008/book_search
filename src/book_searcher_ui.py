@@ -48,4 +48,4 @@ class Ui_MainWindow(object):
         self.db_connect.setText(_translate("MainWindow", "Подключить БД"))
         self.search_method.setText(_translate("MainWindow", "Поиск"))
         self.update_info.setText(_translate("MainWindow", "Редактировать"))
-        self.search_method_2.setText(_translate("MainWindow", "Добавить книгу"))
+        self.add_book.setText(_translate("MainWindow", "Добавить книгу"))

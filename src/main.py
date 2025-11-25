@@ -13,14 +13,14 @@ class Book_Search(QMainWindow, Ui_MainWindow):
         self.con = None
         self.db_connect.clicked.connect(self.db_connection)
         # self.search_method.clicked.connect(self.search)
-        self.add_book.clicked.connect(self.new_book)
+        # self.add_book.clicked.connect(self.new_book)
     
     def db_connection(self):
         db_name = QFileDialog.getOpenFileName(self, 'Выберите базу данных', '', '(*.db);;(*.sqlite3)')[0]
         self.con = sqlite3.connect(db_name)
     
-    def new_book(self):
-        cur = self.con.cursor()
+    # def new_book(self):
+    #     cur = self.con.cursor()
 
     # def search(self):
     #     cur = self.con.cursor()
