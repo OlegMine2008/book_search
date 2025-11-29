@@ -3,7 +3,7 @@ import sys
 
 from book_searcher_ui import Ui_MainWindow
 from asking_ui import Ui_Form
-from PyQt6.QtWidgets import QMainWindow, QApplication, QFileDialog, QDialog, QMessageBox
+from PyQt6.QtWidgets import QMainWindow, QApplication, QFileDialog, QDialog, QMessageBox, QInputDialog
 from PyQt6.QtSql import QSqlQueryModel
 
 
@@ -42,32 +42,55 @@ class Book_Search(QMainWindow, Ui_MainWindow):
         if not self.con:
             QMessageBox.warning(self, "Ошибка", "Сначала подключите базу данных")
             return
-        
+    
         cur = self.con.cursor()
-        u = Asking_Window(cur, self)
-        u.exec()
-        self.con.commit()
+    
+        books_data = cur.execute('''SELECT id, book_name, 
+                               (SELECT author_name FROM authors WHERE id == author_id) 
+                               FROM books''').fetchall()
+    
+        if not books_data:
+            QMessageBox.warning(self, "Ошибка", "База данных пуста")
+            return
+    
+        book_items = [f"{book_id}, {book_name}, {author}" for book_id, book_name, author in books_data]
+    
+        book, ok_pressed = QInputDialog.getItem(
+            self, "Выбор", "Выберите книгу", book_items, 0, False
+        )
+    
+        if ok_pressed and book:
+            selected_id = int(book.split(',')[0].strip())
+            u = Asking_Window(cur, self, selected_id)
+            u.exec()
+            self.con.commit()
 
 
 class Asking_Window(QDialog, Ui_Form):
-    def __init__(self, cursor, main=None):
+    def __init__(self, cursor, main=None, book_id=None):
         super().__init__(main)
         self.setupUi(self)
         self.cur = cursor
-        # info = self.cur.execute(str('''SELECT info FROM books
-        #                                           WHERE id == 1'''))
-        # notes = self.cur.execute(str('''SELECT notes FROM books
-        #                                           WHERE id == 1'''))
-        # self.inform.setPlainText(info)
-        # self.notes.setPlainText(notes)
+        self.book_id = book_id
+        
+        all_info = list(self.cur.execute(f'''SELECT info, notes FROM books 
+                                       WHERE id == {self.book_id}'''))
+        self.inform.setPlainText(all_info[0][0])
+        self.notes.setPlainText(all_info[0][1])
+        
         self.sure_button.clicked.connect(self.approve)
+                
     
     def approve(self):
         info_result = self.inform.toPlainText()
         notes_result = self.notes.toPlainText()
-        self.cur.execute(f'''UPDATE books
-                         SET info = "{info_result}", notes = "{notes_result}" 
-                         WHERE id == 1''')
+        
+        self.cur.execute('''UPDATE books 
+                         SET info = ?, notes = ? 
+                         WHERE id == ?''', 
+                    (info_result, notes_result, self.book_id))
+            
+        self.accept()
         
 
 if __name__ == "__main__":
