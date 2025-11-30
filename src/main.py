@@ -6,6 +6,7 @@ from asking_ui import Ui_Form
 from adding_with_new_ui import Ui_Dialog
 from PyQt6.QtWidgets import QMainWindow, QApplication, QFileDialog, QDialog, QMessageBox, QInputDialog
 from PyQt6.QtSql import QSqlQueryModel
+from adding_ui import Ui_Dialog_2
 
 
 class Book_Search(QMainWindow, Ui_MainWindow):
@@ -41,6 +42,11 @@ class Book_Search(QMainWindow, Ui_MainWindow):
         if ok_pressed:
             if author == 'Новый автор':
                 u = Adding_Window_new(cur, self)
+                u.exec()
+                self.con.commit()
+            else:
+                auth_id = int(author.split(',')[0].strip())
+                u = Adding_Window(cur, self, auth_id)
                 u.exec()
                 self.con.commit()
 
@@ -119,7 +125,6 @@ class Adding_Window_new(QDialog, Ui_Dialog):
         self.cur = cursor
         
         self.sureButton.clicked.connect(self.approve)
-                
     
     def approve(self):
         name = self.author_name.toPlainText()
@@ -134,6 +139,27 @@ class Adding_Window_new(QDialog, Ui_Dialog):
                          VALUES(?, ?, ?, (SELECT id FROM authors
                          WHERE author_name == ?))''', 
                     (book, info_result, notes_result, name))
+            
+        self.accept()
+
+
+class Adding_Window(QDialog, Ui_Dialog_2):
+    def __init__(self, cursor, main=None, auth=None):
+        super().__init__(main)
+        self.setupUi(self)
+        self.cur = cursor
+        self.auth_id = auth
+        
+        self.pushButton.clicked.connect(self.approve)
+                
+    def approve(self):
+        book = self.book_name.toPlainText()
+        info_result = self.info.toPlainText()
+        notes_result = self.notes.toPlainText()
+        
+        self.cur.execute('''INSERT INTO books(book_name, info, notes, author_id)
+                         VALUES(?, ?, ?, ?)''', 
+                    (book, info_result, notes_result, self.auth_id))
             
         self.accept()
 
