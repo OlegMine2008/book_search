@@ -18,6 +18,7 @@ class Book_Search(QMainWindow, Ui_MainWindow):
         # self.search_method.clicked.connect(self.search)
         self.add_book.clicked.connect(self.new_book)
         self.update_info.clicked.connect(self.update_infor)
+        self.delete_book.clicked.connect(self.delete)
 
     def db_connection(self):
         db_name = QFileDialog.getOpenFileName(self, 'Выберите базу данных', '', '(*.db);;(*.sqlite3)')[0]
@@ -89,6 +90,23 @@ class Book_Search(QMainWindow, Ui_MainWindow):
             u = Asking_Window(cur, self, selected_id)
             u.exec()
             self.con.commit()
+        
+    def delete(self):
+        if not self.con:
+            QMessageBox.warning(self, "Ошибка", "Сначала подключите базу данных")
+            return
+    
+        cur = self.con.cursor()
+        operate, ok_pressed = QInputDialog.getText(self, 'Удаление', 'Введите id книги, которую хотите удалить')
+        if ok_pressed:
+            try:
+                cur.execute('''DELETE FROM books WHERE id == ?''', (int(operate),))
+                cur.execute('''UPDATE books
+                            SET id == id - 1
+                            WHERE id > ?''', (int(operate),))
+                self.con.commit()
+            except ValueError:
+                QMessageBox.warning(self, 'Ошибка', 'Вы должни ввести id в виде числа, а не навзание книги или чего либо другого')
 
 
 class Asking_Window(QDialog, Ui_Form):
