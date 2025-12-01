@@ -24,56 +24,75 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="db_connect">
+   <widget class="QPushButton" name="add_book">
     <property name="geometry">
      <rect>
       <x>580</x>
       <y>170</y>
-      <width>171</width>
-      <height>51</height>
+      <width>158</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="text">
-     <string>Подключить БД</string>
+     <string>Добавить книгу</string>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>16</width>
+      <height>20</height>
+     </size>
     </property>
    </widget>
-   <widget class="QPushButton" name="search_method">
+   <widget class="QPushButton" name="delete_book">
     <property name="geometry">
      <rect>
       <x>580</x>
-      <y>90</y>
-      <width>171</width>
-      <height>51</height>
+      <y>240</y>
+      <width>158</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="text">
-     <string>Поиск</string>
+     <string>Удалить книгу</string>
     </property>
    </widget>
    <widget class="QPushButton" name="update_info">
     <property name="geometry">
      <rect>
       <x>580</x>
-      <y>250</y>
-      <width>171</width>
-      <height>51</height>
+      <y>310</y>
+      <width>158</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="text">
-     <string>Обновить информацию или заметки</string>
+     <string>Редактировать</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="add_book">
+   <widget class="QPushButton" name="search_method">
     <property name="geometry">
      <rect>
       <x>580</x>
-      <y>330</y>
-      <width>171</width>
-      <height>51</height>
+      <y>100</y>
+      <width>158</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="text">
-     <string>Добавить книгу</string>
+     <string>Поиск</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="db_connect">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>30</y>
+      <width>158</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Подключить БД</string>
     </property>
    </widget>
   </widget>
