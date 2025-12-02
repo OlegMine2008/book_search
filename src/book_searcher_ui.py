@@ -11,7 +11,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("Book Searcher")
+        MainWindow.setObjectName("MainWindow")
         MainWindow.resize(783, 445)
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -48,9 +48,9 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("Book Searcher", "Book Searcher"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.add_book.setText(_translate("MainWindow", "Добавить книгу"))
-        self.delete_book.setText(_translate("MainWindow", "Удалить книгу"))
+        self.delete_book.setText(_translate("MainWindow", "Удалить"))
         self.update_info.setText(_translate("MainWindow", "Редактировать"))
         self.search_method.setText(_translate("MainWindow", "Поиск"))
         self.db_connect.setText(_translate("MainWindow", "Подключить БД"))

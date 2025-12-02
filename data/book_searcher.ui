@@ -53,7 +53,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Удалить книгу</string>
+     <string>Удалить</string>
     </property>
    </widget>
    <widget class="QPushButton" name="update_info">

@@ -22,7 +22,8 @@ class Book_Search(QMainWindow, Ui_MainWindow):
 
     def db_connection(self):
         db_name = QFileDialog.getOpenFileName(self, 'Выберите базу данных', '', '(*.db);;(*.sqlite3)')[0]
-        self.con = sqlite3.connect(db_name)
+        if db_name:
+            self.con = sqlite3.connect(db_name)
     
     def new_book(self):
         if not self.con:
@@ -97,16 +98,35 @@ class Book_Search(QMainWindow, Ui_MainWindow):
             return
     
         cur = self.con.cursor()
-        operate, ok_pressed = QInputDialog.getText(self, 'Удаление', 'Введите id книги, которую хотите удалить')
-        if ok_pressed:
-            try:
-                cur.execute('''DELETE FROM books WHERE id == ?''', (int(operate),))
-                cur.execute('''UPDATE books
-                            SET id == id - 1
-                            WHERE id > ?''', (int(operate),))
-                self.con.commit()
-            except ValueError:
-                QMessageBox.warning(self, 'Ошибка', 'Вы должни ввести id в виде числа, а не навзание книги или чего либо другого')
+        choose, ok_got = QInputDialog.getItem(self, "Выбор", "Выберите, что хотите удалить", ['Автора', 'Книгу'], 0, False)
+        if ok_got and choose == 'Книгу':
+            operate, ok_pressed = QInputDialog.getText(self, 'Удаление', 'Введите id книги, которую хотите удалить')
+            if ok_pressed:
+                try:
+                    cur.execute('''DELETE FROM books WHERE id == ?''', (int(operate),))
+                    cur.execute('''UPDATE books
+                                SET id == id - 1
+                                WHERE id > ?''', (int(operate),))
+                    self.con.commit()
+                except ValueError:
+                    QMessageBox.warning(self, 'Ошибка', 'Вы должны ввести id в виде числа, а не навзание книги или чего либо другого')
+        elif ok_got and choose == 'Автора':
+            operate, ok_pressed = QInputDialog.getText(self, 'Удаление', 'Введите имя автора, которого хотите удалить')
+            if ok_pressed:
+                if operate.isalpha():
+                    check = list(cur.execute('''SELECT book_name FROM books WHERE author_id == (
+                                SELECT id FROM authors WHERE author_name == ?)''', (operate,)))
+                    if check:
+                        message = 'Вы не можете удалить автора, если в базе данных есть его книги: ' + ''.join(map(str, check))
+                        QMessageBox.warning(self, 'Ошибка', message)
+                    else:
+                        cur.execute('''DELETE FROM authors WHERE author_name == ?''', (operate,))
+                        cur.execute('''UPDATE books
+                                    SET id == id - 1
+                                    WHERE id > ?''', (operate,))
+                        self.con.commit()
+                else:
+                    QMessageBox.warning(self, 'Ошибка', 'Имя автора должно состоять из букв')
 
 
 class Asking_Window(QDialog, Ui_Form):
