@@ -5,7 +5,7 @@ from book_searcher_ui import Ui_MainWindow
 from asking_ui import Ui_Form
 from adding_with_new_ui import Ui_Dialog
 from PyQt6.QtWidgets import QMainWindow, QApplication, QFileDialog, QDialog, QMessageBox, QInputDialog
-from PyQt6.QtSql import QSqlQueryModel
+from PyQt6.QtGui import QStandardItemModel, QStandardItem
 from adding_ui import Ui_Dialog_2
 
 
@@ -15,7 +15,7 @@ class Book_Search(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.con = None
         self.db_connect.clicked.connect(self.db_connection)
-        # self.search_method.clicked.connect(self.search)
+        self.search_method.clicked.connect(self.search)
         self.add_book.clicked.connect(self.new_book)
         self.update_info.clicked.connect(self.update_infor)
         self.delete_book.clicked.connect(self.delete)
@@ -52,19 +52,85 @@ class Book_Search(QMainWindow, Ui_MainWindow):
                 u.exec()
                 self.con.commit()
 
-    # def search(self):
-    #     cur = self.con.cursor()
-    #     methode, ok_pressed = QInputDialog.getItem(self, "Поиск", "Выберите метод поиска", ("Код", "Название", "Автор"), 1, False)
-    #     if ok_pressed and methode == 'Код':
-    #         info, new_pressed = QInputDialog.getText(self, "Поиск по коду", "Введите код книги")
-    #         if new_pressed:
-    #             model = QSqlQueryModel()
-    #             model.setQuery('SELECT * FROM ')
-    #             self.tableView.setModel(f'SELECT * FROM {}')
-    #     elif ok_pressed and methode == 'Название':
-    #         info, new_pressed = QInputDialog.getText(self, "Поиск по названию", "Введите название книги")
-    #     elif ok_pressed and methode == 'Автор':
-    #         info, new_pressed = QInputDialog.getText(self, "Поиск по автору", "Введите имя автора")
+    def search(self):
+        if not self.con:
+            QMessageBox.warning(self, "Ошибка", "Сначала подключите базу данных")
+            return
+        
+        cur = self.con.cursor()
+        
+        methode, ok_pressed = QInputDialog.getItem(self, "Поиск", "Выберите метод поиска", ("Код", "Название", "Автор"), 1, False)
+        
+        if ok_pressed and methode == 'Код':
+            info, new_pressed = QInputDialog.getText(self, "Поиск по коду", "Введите код книги")
+            if new_pressed:
+                answer = cur.execute('''SELECT id, book_name, info, notes, (SELECT author_name FROM authors WHERE id == author_id) as author
+                                     FROM books WHERE id == ?''', (info,)).fetchall()
+                
+                if not answer:
+                    QMessageBox.warning(self, 'Поиск', 'Ничего не нашлось')
+                    return
+                
+            self.titles = [description[0] for description in cur.description]
+        
+            model = QStandardItemModel()
+            model.setHorizontalHeaderLabels(self.titles)
+        
+            for i, row in enumerate(answer):
+                for j, value in enumerate(row):
+                    item = QStandardItem(str(value) if value is not None else "")
+                    model.setItem(i, j, item)
+        
+            self.tableView.setModel(model)
+            self.tableView.resizeColumnsToContents()
+        
+        elif ok_pressed and methode == 'Название':
+            info, new_pressed = QInputDialog.getText(self, "Поиск по названию", "Введите название книги или часть названия")
+            if new_pressed:
+                answer = cur.execute(f'''SELECT id, book_name, info, notes, (SELECT author_name FROM authors WHERE id == author_id) as author
+                                     FROM books WHERE book_name LIKE "%{str(info)}%"''').fetchall()
+                
+                if not answer:
+                    QMessageBox.warning(self, 'Поиск', 'Ничего не нашлось')
+                    return
+                
+            self.titles = [description[0] for description in cur.description]
+        
+            model = QStandardItemModel()
+            model.setHorizontalHeaderLabels(self.titles)
+        
+            for i, row in enumerate(answer):
+                for j, value in enumerate(row):
+                    item = QStandardItem(str(value) if value is not None else "")
+                    model.setItem(i, j, item)
+        
+            self.tableView.setModel(model)
+            self.tableView.resizeColumnsToContents()
+
+        elif ok_pressed and methode == 'Автор':
+            info, new_pressed = QInputDialog.getText(self, "Поиск по автору", "Введите имя, фамилию, отчество автора или часть вышеперечисленного")
+            if new_pressed:
+                answer = cur.execute(f'''SELECT id as Код, book_name as Название, info as Информация, notes as Заметки, 
+                                     (SELECT author_name FROM authors WHERE id == author_id) as Автор
+                                     FROM books WHERE author_id == (SELECT id 
+                                     FROM authors WHERE author_name LIKE "%{info}%")''').fetchall()
+                
+                if not answer:
+                    QMessageBox.warning(self, 'Поиск', 'Ничего не нашлось')
+                    return
+                
+            self.titles = [description[0] for description in cur.description]
+        
+            model = QStandardItemModel()
+            model.setHorizontalHeaderLabels(self.titles)
+        
+            for i, row in enumerate(answer):
+                for j, value in enumerate(row):
+                    item = QStandardItem(str(value) if value is not None else "")
+                    model.setItem(i, j, item)
+        
+            self.tableView.setModel(model)
+            self.tableView.resizeColumnsToContents()
 
     def update_infor(self):
         if not self.con:
@@ -127,6 +193,8 @@ class Book_Search(QMainWindow, Ui_MainWindow):
                         self.con.commit()
                 else:
                     QMessageBox.warning(self, 'Ошибка', 'Имя автора должно состоять из букв')
+        
+    # def search_result(self, type, )
 
 
 class Asking_Window(QDialog, Ui_Form):
