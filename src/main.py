@@ -1,5 +1,5 @@
 import sqlite3
-import sys
+
 
 from book_searcher_ui import Ui_MainWindow
 from asking_ui import Ui_Form
@@ -31,8 +31,8 @@ class Book_Search(QMainWindow, Ui_MainWindow):
             return
         
         cur = self.con.cursor()
-        author_id = cur.execute('''SELECT author_id, (SELECT author_name FROM authors WHERE id == author_id) 
-                                FROM books''').fetchall()
+        author_id = cur.execute('''SELECT id, author_name 
+                                FROM authors''').fetchall()
         
         if not author_id:
             QMessageBox.warning(self, "Ошибка", "База данных пуста")
@@ -180,8 +180,8 @@ class Book_Search(QMainWindow, Ui_MainWindow):
             operate, ok_pressed = QInputDialog.getText(self, 'Удаление', 'Введите имя автора, которого хотите удалить')
             if ok_pressed:
                 if operate.isalpha():
-                    check = list(cur.execute('''SELECT book_name FROM books WHERE author_id == (
-                                SELECT id FROM authors WHERE author_name == ?)''', (operate,)))
+                    check = list(cur.execute(f'''SELECT book_name FROM books WHERE author_id == (
+                                SELECT id FROM authors WHERE author_name LIKE "%{operate}%")'''))
                     if check:
                         message = 'Вы не можете удалить автора, если в базе данных есть его книги: ' + ''.join(map(str, check))
                         QMessageBox.warning(self, 'Ошибка', message)
@@ -193,8 +193,6 @@ class Book_Search(QMainWindow, Ui_MainWindow):
                         self.con.commit()
                 else:
                     QMessageBox.warning(self, 'Ошибка', 'Имя автора должно состоять из букв')
-        
-    # def search_result(self, type, )
 
 
 class Asking_Window(QDialog, Ui_Form):

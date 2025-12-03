@@ -48,7 +48,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Книжный Оператор"))
         self.add_book.setText(_translate("MainWindow", "Добавить книгу"))
         self.delete_book.setText(_translate("MainWindow", "Удалить"))
         self.update_info.setText(_translate("MainWindow", "Редактировать"))
